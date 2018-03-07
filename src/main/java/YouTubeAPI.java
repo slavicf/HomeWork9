@@ -19,7 +19,7 @@ public class YouTubeAPI {
         }
     };
     static {
-        System.out.println("Unirest Object Mapper initialization");
+//        System.out.println("Unirest Object Mapper initialization");
         Unirest.setObjectMapper(mapper);
     }
 
@@ -30,6 +30,17 @@ public class YouTubeAPI {
                 .queryString("maxResults", maxResults)
                 .queryString("q", query)
                 .asObject(ResponseSearch.class);
+
+        return response.getBody();
+    }
+
+    public static String search(String query) throws UnirestException {
+        HttpResponse<String> response = Unirest.get("https://www.googleapis.com/youtube/v3/search")
+                .queryString("key", API_KEY)
+                .queryString("part", "snippet")
+                .queryString("maxResults", 1)
+                .queryString("q", query)
+                .asString();
 
         return response.getBody();
     }
