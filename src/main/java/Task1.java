@@ -1,7 +1,6 @@
 import com.mashape.unirest.http.exceptions.UnirestException;
 import entity.ResponseSearch;
 import entity.SnippetVideo;
-import entity.Thumbnail;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -13,7 +12,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -24,14 +22,12 @@ import java.time.format.DateTimeFormatter;
 public class Task1 extends Application {
 
     private static Pane pane = new Pane();
-    private static Scene scene = new Scene(pane, 1600, 800);
+    private static Scene scene;
     private static Insets margin = new Insets(5);
     private static TextField textField;
     private static Button btn1;
     private static Button btn2;
-    private static Image image;
     private static ImageView imageView;
-//    private static Label label;
     private static TextArea textArea;
     private static WebView webview;
     private static ResponseSearch responseSearch = new ResponseSearch();
@@ -40,18 +36,25 @@ public class Task1 extends Application {
         launch(args);
     }
 
-    private static Button button(String text, int column, int row, int width, int heigth) {
+    public static void textField(String text, int x, int y) {
+        textField = new TextField(text);
+        textField.setLayoutX(x);
+        textField.setLayoutY(y);
+        textField.setPrefColumnCount(28);
+        textField.setAlignment(Pos.CENTER_LEFT);
+        pane.getChildren().add(textField);
+    }
+
+    private static Button button(String text, int x, int y, int width, int heigth) {
         Button button = new Button(text);
         button.setPrefSize(width, heigth);
-        GridPane.setConstraints(button, column, row);
-        GridPane.setMargin(button, margin);
+        Layout.set(button, x, y, width, heigth);
         pane.getChildren().add(button);
         return button;
     }
 
     public static Label label(int x, int y, int width, int height) {
         Label label = new Label();
-        label.setPrefSize(width, height);
         label.setAlignment(Pos.TOP_LEFT);
         label.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
         Layout.set(label, x, y, width, height);
@@ -59,51 +62,35 @@ public class Task1 extends Application {
         return label;
     }
 
-    public static TextArea textArea(int column, int row, int width, int height) {
-        TextArea textArea = new TextArea();
-        textArea.setPrefSize(width, height);
-        textArea.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
-        GridPane.setConstraints(textArea, column, row);
-        GridPane.setMargin(textArea, new Insets(2));
+    public static void textArea(int x, int y, int width, int height) {
+        textArea = new TextArea();
+//        textArea.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
+        Layout.set(textArea, x, y, width, height);
         pane.getChildren().add(textArea);
-        return textArea;
     }
 
-    public static ImageView imageView(String url, int column, int row, int width) {
-        Image image = new Image(url, true);
-        ImageView imageView =  new ImageView(image);
+    public static void imageView(String url, int x, int y, int width) {
+        ImageView imageView =  new ImageView(new Image(url, true));
+        imageView.setX(x);
+        imageView.setY(y);
         imageView.setFitWidth(width);
         imageView.setPreserveRatio(true);
-        GridPane.setConstraints(imageView, column, row);
-        GridPane.setMargin(imageView, margin);
         pane.getChildren().add(imageView);
-        return imageView;
     }
 
-    public static WebView webView(int column, int row, int width, int height) {
+    public static void webView(int x, int y, int width, int height) {
         WebView frame = new WebView();
+        frame.setLayoutX(x);
+        frame.setLayoutY(y);
         frame.setPrefSize(width, height);
-        GridPane.setConstraints(frame, column, row);
-        GridPane.setMargin(frame, margin);
         pane.getChildren().add(frame);
-        return frame;
-    }
-
-    public static TextField textField(String text, int column, int row) {
-        TextField textField = new TextField(text);
-        textField.setPrefColumnCount(20);
-        textField.setAlignment(Pos.CENTER_LEFT);
-        GridPane.setConstraints(textField, column, row);
-        GridPane.setMargin(textField, margin);
-        pane.getChildren().add(textField);
-        return textField;
     }
 
     public static void search(String query) {
         new Thread(() -> {
             try {
 //            System.out.printf(YouTubeAPI.search(query));
-                responseSearch = YouTubeAPI.search(query, 1);
+                responseSearch = YouTubeAPI.search(query, 5);
 
                 String result = "";
                 SnippetVideo snippet = responseSearch.items[0].snippet;
@@ -117,8 +104,9 @@ public class Task1 extends Application {
 //            result +=  df.parse(target).toString() + "\n\n";
                 textArea.setText(result);
                 Platform.runLater(() -> {
-                    Thumbnail thumb = snippet.thumbnails.high;
-                    imageView = imageView(thumb.url, 1, 1, thumb.width);
+//                    imageView(thumb.url, 625, 30, thumb.width);
+                    Image image = new Image(snippet.thumbnails.high.url, true);
+                    imageView.setImage(image);
                 });
             } catch (UnirestException e) {
                 e.printStackTrace();
@@ -128,14 +116,16 @@ public class Task1 extends Application {
 
     @Override
     public void start(Stage stage) {
+        scene  = new Scene(pane, 1110, 800);
         stage.setTitle("YouTube Search");
         stage.setResizable(false);
         stage.getIcons().add(new Image("https://cdn1.iconfinder.com/data/icons/logotypes/32/youtube-256.png"));
-        textField = textField("Camila Cabello - Havana (Audio)", 0, 0);
-        btn1 = button("Search", 1, 0, 100, 25);
-        btn2 = button("View", 1, 2, 100, 25);
-        textArea = textArea(0, 1, 1100, 360);
-        webview = webView(0,2,800,600);
+        textField("Camila Cabello - Havana (Audio)", 5, 5);
+        textArea(5, 30, 615, 360);
+        webView(5,400,1100,600);
+        imageView("http://www.clipartly.com/wp-content/uploads/2017/07/Youtube-Icon-Png-Clipart.png", 625, 30, 480);
+        btn1 = button("Search", 300, 5, 95, 20);
+        btn2 = button("View", 400, 5, 95, 20);
 
         btn1.setOnAction(event -> {
             search(textField.getText());
@@ -150,15 +140,5 @@ public class Task1 extends Application {
 
         stage.setScene(scene);
         stage.show();
-
-//   =============================================================
-        try {
-            responseSearch = YouTubeAPI.search("Sia - The Greatest", 1);
-//            Thumbnail thumb = responseSearch.items[0].snippet.thumbnails.high;
-//            imageView = imageView(thumb.url, 1, 1, thumb.width);
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-//   =============================================================
     }
 }
