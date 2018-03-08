@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Task1 extends Application {
 
-    private static Pane pane = new GridPane();
+    private static Pane pane = new Pane();
     private static Scene scene = new Scene(pane, 1600, 800);
     private static Insets margin = new Insets(5);
     private static TextField textField;
@@ -49,13 +49,12 @@ public class Task1 extends Application {
         return button;
     }
 
-    public static Label label(int column, int row, int width, int height) {
+    public static Label label(int x, int y, int width, int height) {
         Label label = new Label();
         label.setPrefSize(width, height);
         label.setAlignment(Pos.TOP_LEFT);
         label.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
-        GridPane.setConstraints(label, column, row);
-        GridPane.setMargin(label, new Insets(2));
+        Layout.set(label, x, y, width, height);
         pane.getChildren().add(label);
         return label;
     }
@@ -71,7 +70,7 @@ public class Task1 extends Application {
     }
 
     public static ImageView imageView(String url, int column, int row, int width) {
-        Image image = new Image(url);
+        Image image = new Image(url, true);
         ImageView imageView =  new ImageView(image);
         imageView.setFitWidth(width);
         imageView.setPreserveRatio(true);
