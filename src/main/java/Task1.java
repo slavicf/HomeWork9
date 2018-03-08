@@ -6,10 +6,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -23,7 +20,6 @@ public class Task1 extends Application {
 
     private static Pane pane = new Pane();
     private static Scene scene;
-    private static Insets margin = new Insets(5);
     private static TextField textField;
     private static Button btn1;
     private static Button btn2;
@@ -34,6 +30,16 @@ public class Task1 extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static void layout(Control control, int x, int y) {
+        control.setLayoutX(x);
+        control.setLayoutY(y);
+    }
+
+    public static void layout(Control control, int x, int y, int width, int height) {
+        layout(control, x, y);
+        control.setPrefSize(width, height);
     }
 
     public static void textField(String text, int x, int y) {
@@ -47,25 +53,23 @@ public class Task1 extends Application {
 
     private static Button button(String text, int x, int y, int width, int heigth) {
         Button button = new Button(text);
-        button.setPrefSize(width, heigth);
-        Layout.set(button, x, y, width, heigth);
+        layout(button, x, y, width, heigth);
         pane.getChildren().add(button);
         return button;
     }
 
-    public static Label label(int x, int y, int width, int height) {
+    public static void label(int x, int y, int width, int height) {
         Label label = new Label();
         label.setAlignment(Pos.TOP_LEFT);
         label.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
-        Layout.set(label, x, y, width, height);
+        layout(label, x, y, width, height);
         pane.getChildren().add(label);
-        return label;
     }
 
     public static void textArea(int x, int y, int width, int height) {
         textArea = new TextArea();
 //        textArea.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
-        Layout.set(textArea, x, y, width, height);
+        layout(textArea, x, y, width, height);
         pane.getChildren().add(textArea);
     }
 
