@@ -20,23 +20,21 @@ import java.time.format.DateTimeFormatter;
 public class Main extends Application {
     //  -------------------------------------------------------------------------
     private static Pane pane = new Pane();
+    private static Pane box = new Pane();
     private static TextField textField;
     private static ImageView imageView;
     private static TextArea textArea;
+    private static Button btnView;
     private static WebView webView;
     private static ResponseSearch responseSearch = new ResponseSearch();
     //  -------------------------------------------------------------------------
     private static int[] txtFld = {5, 5, 275, 20};
     private static int[] btnSch = {285, 5, 95, 20};
-    private static int[] btnVew = {385, 5, 95, 20};
-    private static int[] image = {485, 5, 480, 360};
-    private static int[] txtArr = {5, 30, 475, 335};
-    private static int[] view = {5, 370, 960, 540};
+    private static int[] btnVew = {5, 210, 230, 40};
+    private static int[] image = {120, 30, 0, 540};
+    private static int[] txtArr = {5, 30, 960, 175};
+    private static int[] view = {5, 30, 960, 540};
     //  -------------------------------------------------------------------------
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     private static void layout(Control control, int[] prop) {
         control.setLayoutX(prop[0]);
@@ -48,39 +46,39 @@ public class Main extends Application {
         textField = new TextField(text);
         layout(textField, prop);
         textField.setAlignment(Pos.CENTER_LEFT);
-        pane.getChildren().add(textField);
+//        pane.getChildren().add(textField);
     }
 
     private static Button button(String text, int[] prop) {
         Button button = new Button(text);
         layout(button, prop);
-        pane.getChildren().add(button);
+//        pane.getChildren().add(button);
         return button;
     }
 
-    public static void label(int[] prop) {
+    public static void label(String text, int[] prop) {
         Label label = new Label();
         label.setAlignment(Pos.TOP_LEFT);
         label.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
         layout(label, prop);
-        pane.getChildren().add(label);
+//        pane.getChildren().add(label);
     }
 
     private static void textArea(int[] prop) {
         textArea = new TextArea();
 //        textArea.setStyle("-fx-border-color:silver; -fx-background-color: white;");    // -fx-background-color: #CCFF99
         layout(textArea, prop);
-        pane.getChildren().add(textArea);
+//        pane.getChildren().add(textArea);
     }
 
     private static ImageView imageView(String url, int[] prop) {
         ImageView imageView = new ImageView(new Image(url, true));
         imageView.setX(prop[0]);
         imageView.setY(prop[1]);
-        imageView.setFitWidth(prop[2]);
+//        imageView.setFitWidth(prop[2]);
         imageView.setFitHeight(prop[3]);
-//        imageView.setPreserveRatio(true);
-        pane.getChildren().add(imageView);
+        imageView.setPreserveRatio(true);
+//        pane.getChildren().add(imageView);
         return imageView;
     }
 
@@ -89,7 +87,7 @@ public class Main extends Application {
         webView.setLayoutX(prop[0]);
         webView.setLayoutY(prop[1]);
         webView.setPrefSize(prop[2], prop[3]);
-        pane.getChildren().add(webView);
+//        pane.getChildren().add(webView);
         return webView;
     }
 
@@ -109,7 +107,15 @@ public class Main extends Application {
 //                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX", Locale.ENGLISH);
 //                result += df.parse(target).toString() + "\n\n";
                 textArea.setText(result);
-                Platform.runLater(() -> imageView.setImage(new Image(snippet.thumbnails.high.url, true)));
+                Platform.runLater(() -> {
+                    webView.getEngine().load(null);
+                    box.getChildren().clear();
+                    box.getChildren().addAll(textArea, btnView, imageView);
+                    imageView.setX(240);
+                    imageView.setY(210);
+                    imageView.setFitHeight(360);
+                    imageView.setImage(new Image(snippet.thumbnails.high.url, true));
+                });
             } catch (UnirestException e) {
                 e.printStackTrace();
             }
@@ -117,22 +123,25 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws MalformedURLException {
-        Scene scene = new Scene(pane, 970, 915);
-        stage.setTitle("YouTube Search");
-        stage.setResizable(false);
-        stage.getIcons().add(new Image("https://cdn1.iconfinder.com/data/icons/logotypes/32/youtube-256.png"));
+    public void start(Stage primaryStage) throws MalformedURLException {
+        Scene scene = new Scene(pane, 970, 575);
+        pane.getChildren().add(box);
+        primaryStage.setTitle("YouTube Search");
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("https://cdn1.iconfinder.com/data/icons/logotypes/32/youtube-256.png"));
 
         textField("go go", txtFld);
-
         Button btnSearch = button("Search", btnSch);
-        Button btnView = button("View", btnVew);
-
-        textArea(txtArr);
+        pane.getChildren().addAll(textField, btnSearch);
 
         File file = new File("lib/youtube.jpg");
         String localUrl = file.toURI().toURL().toString();
         imageView = imageView(localUrl, image);
+        box.getChildren().add(imageView);
+
+        btnView = button("View", btnVew);
+
+        textArea(txtArr);
 
         webView = webView(view);
 
@@ -142,11 +151,17 @@ public class Main extends Application {
         });
 
         btnView.setOnAction(event -> {
+            box.getChildren().clear();
+            box.getChildren().add(webView);
             String url = "https://www.youtube.com/embed/" + responseSearch.items[0].id.videoId + "?autoplay=1";
             webView.getEngine().load(url);
         });
 
-        stage.setScene(scene);
-        stage.show();
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
